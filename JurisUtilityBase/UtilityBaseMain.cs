@@ -31,9 +31,13 @@ namespace JurisUtilityBase
 
         public string JBillsDbName { get; set; }
 
-        public int FldClient { get; set; }
+        public string employeesOrig = "";
 
-        public int FldMatter { get; set; }
+        public string allEmployeesOrig = ""; //used if they select all employees
+
+        public string employeesBill = "";
+
+        public string allEmployeesBill = ""; //used if they select all employees
 
         private ListViewColumnSorter lvwColumnSorter1;
 
@@ -46,16 +50,17 @@ namespace JurisUtilityBase
             InitializeComponent();
             _jurisUtility = new JurisUtility();
 
-            listView2.MultiSelect = true;
-            listView2.CheckBoxes = true;
-            listView2.FullRowSelect = true;
+            listViewClient.MultiSelect = true;
+            listViewClient.CheckBoxes = true;
+            listViewClient.FullRowSelect = true;
             setColumns();
             lvwColumnSorter1 = new ListViewColumnSorter();
-            this.listView2.ListViewItemSorter = lvwColumnSorter1;
+            this.listViewClient.ListViewItemSorter = lvwColumnSorter1;
             comboBox1.SelectedIndex = 1;
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
             comboBox4.SelectedIndex = 0;
+
         }
 
         #endregion
@@ -64,9 +69,9 @@ namespace JurisUtilityBase
 
         public void setColumns()
         {
-            listView2.Columns.Add("Client ID", 80, HorizontalAlignment.Left);
-            listView2.Columns.Add("Client Code", 75, HorizontalAlignment.Left);
-            listView2.Columns.Add("Client Name", 350, HorizontalAlignment.Left);
+            listViewClient.Columns.Add("Client ID", 80, HorizontalAlignment.Left);
+            listViewClient.Columns.Add("Client Code", 75, HorizontalAlignment.Left);
+            listViewClient.Columns.Add("Client Name", 350, HorizontalAlignment.Left);
         }
 
 
@@ -110,7 +115,7 @@ namespace JurisUtilityBase
                 ///GetFieldLengths();
             }
 
-            listView2.Clear();
+            listViewClient.Clear();
             setColumns();
             string SQLTkpr = "SELECT [CliSysNbr] ,right([CliCode], 8) as CliCode,[CliNickName] FROM [Client]";
             DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQLTkpr);
@@ -134,9 +139,46 @@ namespace JurisUtilityBase
                     ListViewItem lvi = new ListViewItem(dr["CliSysNbr"].ToString());
                     lvi.SubItems.Add(offsetClient + dr["CliCode"].ToString().Trim());
                     lvi.SubItems.Add(dr["CliNickName"].ToString()); 
-                    listView2.Items.Add(lvi);
+                    listViewClient.Items.Add(lvi);
 
                 }
+            }
+
+            comboBoxBill.ClearItems();
+            myRSTkpr.Clear();
+            SQLTkpr = "select cast(EmpSysNbr as varchar) + ' ' + EmpName as employee from employee";
+            myRSTkpr = _jurisUtility.RecordsetFromSQL(SQLTkpr);
+
+            if (myRSTkpr.Tables[0].Rows.Count == 0)
+                comboBoxBill.SelectedIndex = 0;
+            else
+            {
+                comboBoxBill.Items.Add("* All Employees");
+                foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+                {
+                    comboBoxBill.Items.Add(dr["employee"].ToString());
+                    allEmployeesBill = allEmployeesBill + dr["employee"].ToString().Split(' ')[0] + ",";
+                }
+                allEmployeesBill = allEmployeesBill.TrimEnd(',');
+
+            }
+
+            comboBoxOrig.ClearItems();
+            myRSTkpr.Clear();
+            SQLTkpr = "select cast(EmpSysNbr as varchar) + ' ' + EmpName as employee from employee";
+            myRSTkpr = _jurisUtility.RecordsetFromSQL(SQLTkpr);
+
+            if (myRSTkpr.Tables[0].Rows.Count == 0)
+                comboBoxOrig.SelectedIndex = 0;
+            else
+            {
+                comboBoxOrig.Items.Add("* All Employees");
+                foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+                {
+                    comboBoxOrig.Items.Add(dr["employee"].ToString());
+                    allEmployeesOrig = allEmployeesOrig + dr["employee"].ToString().Split(' ')[0] + ",";
+                }
+                allEmployeesOrig = allEmployeesOrig.TrimEnd(',');
             }
 
 
@@ -150,53 +192,118 @@ namespace JurisUtilityBase
 
         private void DoDaFix()
         {
-            try //ensures number of copies is an int. If not, go to Catch block
-            {
+          //  try //ensures number of copies is an int. If not, go to Catch block
+           // {
                 Int32.Parse(textBox2.Text);
-                string selectedClients = "";
-                foreach (ListViewItem eachItem in listView2.CheckedItems)
-                {
-                    selectedClients = selectedClients + eachItem.SubItems[0].Text + ","; //get the client id from each item selected
-                }
+                
+                //orig
+                if (radioButtonBill.Checked)
+                    processByBillTkpr();
+                //bill
+                else if (radioButtonOrig.Checked)
+                    processByOrigTkpr();
 
-                selectedClients = selectedClients.TrimEnd(',');
-                if (!String.IsNullOrEmpty(selectedClients))
-                {
-                    DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selected clients. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (dialog == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        //get matterIDs from clients
-                        string selectedMatters = "";
-                        string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr in (" + selectedClients + ") and MatStatusFlag <> 'C'";
-                        DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
-                        foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
-                        {
-                            selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
-                        }
-                        selectedMatters = selectedMatters.TrimEnd(',');
+                //client
+                else if (radioButtonClient.Checked)
+                    processByClient();
 
-                        //now do the damn thing
-                        SQL = "update billcopy set BilCpyNbrOfCopies=" + textBox2.Text + ", bilcpyprintformat=" + comboBox1.SelectedIndex + ", bilcpyemailformat=" + comboBox3.SelectedIndex + ", bilcpyexportformat=" + comboBox4.SelectedIndex + ", BilCpyARFormat=" + comboBox2.SelectedIndex;
+          //  }
+          //  catch (Exception ex1)//we only get here if they put something NOT an int in the "Number of Copies" textbox
+          //  {
+           //     MessageBox.Show("Number of copies entered is not a valid integer" + "\r\n" + ex1.Message, "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+           // }
+        }
 
-                        if (!String.IsNullOrEmpty(textBox1.Text)) //if they entered a comment, add it
-                            SQL = SQL + ", BilCpyComment = '" + textBox1.Text + "' from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                        else
-                            SQL = SQL + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+        private void processByBillTkpr()
+        {
+            string selectedMatters = "";
+            String SQL = "";
 
-                        _jurisUtility.ExecuteNonQueryCommand(0, SQL);
-                        UpdateStatus("Selected matters updated.", 1, 1);
-
-                        MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
-                    }
-                }
-                else //there were no matters selected
-                    MessageBox.Show("Please select at least one client", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
-            catch (Exception ex1)
+            SQL = "SELECT MatSysNbr FROM [BillTo] inner join matter on BillToSysNbr = MatBillTo where BillToBillingAtty in (" + employeesBill + ")";
+            DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
+            foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
             {
-                MessageBox.Show("Number of copies entered is not a valid integer", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
+            }
+            selectedMatters = selectedMatters.TrimEnd(',');
+            runUpdateSQL(selectedMatters);
+        }
+
+        private void processByOrigTkpr()
+        {
+            string selectedMatters = "";
+            string SQL = "SELECT MOrigMat FROM MatOrigAtty where MOrigAtty in (" + employeesOrig + ")";
+            DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
+            foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+            {
+                selectedMatters = selectedMatters + dr["MOrigMat"].ToString() + ",";
+            }
+            selectedMatters = selectedMatters.TrimEnd(',');
+            runUpdateSQL(selectedMatters);
+
+
+        }
+
+        private void processByClient()
+        {
+            string selectedClients = "";
+            foreach (ListViewItem eachItem in listViewClient.CheckedItems)
+            {
+                selectedClients = selectedClients + eachItem.SubItems[0].Text + ","; //get the client id from each item selected
+            }
+
+            selectedClients = selectedClients.TrimEnd(',');
+            if (!String.IsNullOrEmpty(selectedClients))
+            {
+
+                    //get matterIDs from clients
+                    string selectedMatters = "";
+                    string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr in (" + selectedClients + ") and MatStatusFlag <> 'C'";
+                    DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
+                    foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+                    {
+                        selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
+                    }
+                    selectedMatters = selectedMatters.TrimEnd(',');
+
+                    //now do the damn thing
+                    runUpdateSQL(selectedMatters);
+                
+            }
+            else //there were no matters selected
+                MessageBox.Show("Please select at least one client", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+        }
+
+        private void runUpdateSQL(string selectedMatters)
+        {
+
+            string SQLTkpr = getReportSQL(selectedMatters);
+
+            DataSet report = _jurisUtility.RecordsetFromSQL(SQLTkpr);
+
+            ReportDisplay rpds = new ReportDisplay(report);
+            rpds.ShowDialog();
+
+
+            DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialog == System.Windows.Forms.DialogResult.Yes)
+            {
+                string SQL = "update billcopy set BilCpyNbrOfCopies=" + textBox2.Text + ", bilcpyprintformat=" + comboBox1.SelectedIndex + ", bilcpyemailformat=" + comboBox3.SelectedIndex + ", bilcpyexportformat=" + comboBox4.SelectedIndex + ", BilCpyARFormat=" + comboBox2.SelectedIndex;
+
+                if (!String.IsNullOrEmpty(textBox1.Text)) //if they entered a comment, add it
+                    SQL = SQL + ", BilCpyComment = '" + textBox1.Text + "' from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+                else
+                    SQL = SQL + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+                _jurisUtility.ExecuteNonQueryCommand(0, SQL);
+                UpdateStatus("Selected matters updated.", 1, 1);
+
+                MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
             }
         }
+
+
+
+
         private bool VerifyFirmName()
         {
             //    Dim SQL     As String
@@ -349,24 +456,20 @@ namespace JurisUtilityBase
             DoDaFix();
         }
 
-        private void buttonReport_Click(object sender, EventArgs e)
+        private void buttonExit_Click(object sender, EventArgs e)
         {
 
             System.Environment.Exit(0);
           
         }
 
-        private string getReportSQL()
+        private string getReportSQL(string selectedMatters)
         {
             string reportSQL = "";
             //if matter and billing timekeeper
-            if (true)
-                reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname,empinitials as CurrentBillingTimekeeper, 'DEF' as NewBillingTimekeeper" +
+                reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname" +
                         " from matter" +
-                        " inner join client on matclinbr=clisysnbr" +
-                        " inner join billto on matbillto=billtosysnbr" +
-                        " inner join employee on empsysnbr=billtobillingatty" +
-                        " where empinitials<>'ABC'";
+                        " inner join client on matclinbr=clisysnbr where matsysnbr in (" + selectedMatters + ")";
 
 
             return reportSQL;
@@ -374,19 +477,19 @@ namespace JurisUtilityBase
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked == true) // we WANT all selected
+            if (checkBoxClient.Checked == true) // we WANT all selected
             {
-                for (int i = 0; i < listView2.Items.Count; i++)
+                for (int i = 0; i < listViewClient.Items.Count; i++)
                 {
-                    listView2.Items[i].Checked = true;
+                    listViewClient.Items[i].Checked = true;
                 }
 
             }
             else //we want them all DESELECTED
             {
-                for (int i = 0; i < listView2.Items.Count; i++)
+                for (int i = 0; i < listViewClient.Items.Count; i++)
                 {
-                    listView2.Items[i].Checked = false;
+                    listViewClient.Items[i].Checked = false;
                 }
             }
         }
@@ -413,12 +516,12 @@ namespace JurisUtilityBase
             }
 
             // Perform the sort with these new sort options.
-            this.listView2.Sort();
+            this.listViewClient.Sort();
         }
 
         private void listView2_MouseClick(object sender, MouseEventArgs e)
         {
-            var where = listView2.HitTest(e.Location);
+            var where = listViewClient.HitTest(e.Location);
 
             if (where.Location == ListViewHitTestLocations.Label)
             {
@@ -430,6 +533,60 @@ namespace JurisUtilityBase
 
         }
 
+
+        private void makeItemsVisibleOrInvisible(bool orig, bool bill, bool client)
+        {
+            comboBoxBill.Visible = bill;
+            comboBoxOrig.Visible = orig;
+            listViewClient.Visible = client;
+            checkBoxClient.Visible = client;
+        }
+
+        private void radioButtonOrig_Click(object sender, EventArgs e)
+        {
+            if (radioButtonOrig.Checked)
+            {
+                makeItemsVisibleOrInvisible(true, false, false);
+                radioButtonBill.Checked = false;
+                radioButtonClient.Checked = false;
+            }
+        }
+
+        private void radioButtonBill_Click(object sender, EventArgs e)
+        {
+            if (radioButtonBill.Checked)
+            {
+                makeItemsVisibleOrInvisible(false, true, false);
+                radioButtonOrig.Checked = false;
+                radioButtonClient.Checked = false;
+            }
+        }
+
+        private void radioButtonClient_Click(object sender, EventArgs e)
+        {
+            if (radioButtonClient.Checked)
+            {
+                makeItemsVisibleOrInvisible(false, false, true);
+                radioButtonOrig.Checked = false;
+                radioButtonBill.Checked = false;
+            }
+        }
+
+        private void comboBoxOrig_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!comboBoxOrig.Text.StartsWith("*"))
+                employeesOrig = comboBoxOrig.Text.Split(' ')[0];
+            else
+                employeesOrig = allEmployeesOrig;
+        }
+
+        private void comboBoxBill_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!comboBoxBill.Text.StartsWith("*"))
+                employeesBill = comboBoxBill.Text.Split(' ')[0];
+            else
+                employeesBill = allEmployeesBill;
+        }
 
 
 

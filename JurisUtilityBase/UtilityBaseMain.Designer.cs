@@ -40,15 +40,14 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.labelPercentComplete = new System.Windows.Forms.Label();
             this.OpenFileDialogOpen = new System.Windows.Forms.OpenFileDialog();
-            this.buttonReport = new System.Windows.Forms.Button();
+            this.buttonExit = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBoxClient = new System.Windows.Forms.CheckBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
-            this.listView2 = new System.Windows.Forms.ListView();
-            this.label2 = new System.Windows.Forms.Label();
+            this.listViewClient = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -57,10 +56,21 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButtonClient = new System.Windows.Forms.RadioButton();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.comboBoxOrig = new System.Windows.Forms.ComboBox();
+            this.radioButtonOrig = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.comboBoxBill = new System.Windows.Forms.ComboBox();
+            this.radioButtonBill = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.JurisLogoImageBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LexisNexisLogoPictureBox)).BeginInit();
             this.statusStrip.SuspendLayout();
             this.statusGroupBox.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // JurisLogoImageBox
@@ -88,7 +98,7 @@
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 395);
+            this.statusStrip.Location = new System.Drawing.Point(0, 434);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(853, 22);
             this.statusStrip.TabIndex = 2;
@@ -161,44 +171,45 @@
             // 
             this.OpenFileDialogOpen.FileName = "openFileDialog1";
             // 
-            // buttonReport
+            // buttonExit
             // 
-            this.buttonReport.BackColor = System.Drawing.Color.LightGray;
-            this.buttonReport.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonReport.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.buttonReport.Location = new System.Drawing.Point(133, 343);
-            this.buttonReport.Name = "buttonReport";
-            this.buttonReport.Size = new System.Drawing.Size(148, 38);
-            this.buttonReport.TabIndex = 16;
-            this.buttonReport.Text = "Exit";
-            this.buttonReport.UseVisualStyleBackColor = false;
-            this.buttonReport.Click += new System.EventHandler(this.buttonReport_Click);
+            this.buttonExit.BackColor = System.Drawing.Color.LightGray;
+            this.buttonExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonExit.ForeColor = System.Drawing.Color.MidnightBlue;
+            this.buttonExit.Location = new System.Drawing.Point(133, 384);
+            this.buttonExit.Name = "buttonExit";
+            this.buttonExit.Size = new System.Drawing.Size(148, 38);
+            this.buttonExit.TabIndex = 16;
+            this.buttonExit.Text = "Exit";
+            this.buttonExit.UseVisualStyleBackColor = false;
+            this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
             // 
             // button1
             // 
             this.button1.BackColor = System.Drawing.Color.LightGray;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.button1.Location = new System.Drawing.Point(489, 343);
+            this.button1.Location = new System.Drawing.Point(489, 384);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(148, 38);
             this.button1.TabIndex = 17;
-            this.button1.Text = "Run";
+            this.button1.Text = "Review Data";
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // checkBox1
+            // checkBoxClient
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
-            this.checkBox1.ForeColor = System.Drawing.Color.Navy;
-            this.checkBox1.Location = new System.Drawing.Point(489, 60);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(144, 20);
-            this.checkBox1.TabIndex = 20;
-            this.checkBox1.Text = "Select All Clients";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBoxClient.AutoSize = true;
+            this.checkBoxClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxClient.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxClient.Location = new System.Drawing.Point(372, 16);
+            this.checkBoxClient.Name = "checkBoxClient";
+            this.checkBoxClient.Size = new System.Drawing.Size(144, 20);
+            this.checkBoxClient.TabIndex = 20;
+            this.checkBoxClient.Text = "Select All Clients";
+            this.checkBoxClient.UseVisualStyleBackColor = true;
+            this.checkBoxClient.Visible = false;
+            this.checkBoxClient.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // comboBox1
             // 
@@ -256,28 +267,18 @@
             this.comboBox4.Size = new System.Drawing.Size(180, 21);
             this.comboBox4.TabIndex = 25;
             // 
-            // listView2
+            // listViewClient
             // 
-            this.listView2.Location = new System.Drawing.Point(121, 82);
-            this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(516, 255);
-            this.listView2.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.listView2.TabIndex = 26;
-            this.listView2.UseCompatibleStateImageBehavior = false;
-            this.listView2.View = System.Windows.Forms.View.Details;
-            this.listView2.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
-            this.listView2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView2_MouseClick);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Navy;
-            this.label2.Location = new System.Drawing.Point(118, 63);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(197, 16);
-            this.label2.TabIndex = 27;
-            this.label2.Text = "Select the Clients to update";
+            this.listViewClient.Location = new System.Drawing.Point(12, 45);
+            this.listViewClient.Name = "listViewClient";
+            this.listViewClient.Size = new System.Drawing.Size(510, 173);
+            this.listViewClient.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.listViewClient.TabIndex = 26;
+            this.listViewClient.UseCompatibleStateImageBehavior = false;
+            this.listViewClient.View = System.Windows.Forms.View.Details;
+            this.listViewClient.Visible = false;
+            this.listViewClient.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.listViewClient.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView2_MouseClick);
             // 
             // label1
             // 
@@ -362,13 +363,115 @@
             this.textBox2.TabIndex = 35;
             this.textBox2.Text = "1";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.radioButtonClient);
+            this.groupBox1.Controls.Add(this.listViewClient);
+            this.groupBox1.Controls.Add(this.checkBoxClient);
+            this.groupBox1.ForeColor = System.Drawing.Color.Navy;
+            this.groupBox1.Location = new System.Drawing.Point(121, 153);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(528, 226);
+            this.groupBox1.TabIndex = 36;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "By Client";
+            // 
+            // radioButtonClient
+            // 
+            this.radioButtonClient.AutoSize = true;
+            this.radioButtonClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.radioButtonClient.Location = new System.Drawing.Point(12, 19);
+            this.radioButtonClient.Name = "radioButtonClient";
+            this.radioButtonClient.Size = new System.Drawing.Size(182, 20);
+            this.radioButtonClient.TabIndex = 0;
+            this.radioButtonClient.TabStop = true;
+            this.radioButtonClient.Text = "Copy settings by client";
+            this.radioButtonClient.UseVisualStyleBackColor = true;
+            this.radioButtonClient.Click += new System.EventHandler(this.radioButtonClient_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.comboBoxOrig);
+            this.groupBox2.Controls.Add(this.radioButtonOrig);
+            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.groupBox2.ForeColor = System.Drawing.Color.Navy;
+            this.groupBox2.Location = new System.Drawing.Point(121, 63);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(259, 84);
+            this.groupBox2.TabIndex = 37;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "By Orig Tkpr";
+            // 
+            // comboBoxOrig
+            // 
+            this.comboBoxOrig.FormattingEnabled = true;
+            this.comboBoxOrig.Location = new System.Drawing.Point(12, 44);
+            this.comboBoxOrig.Name = "comboBoxOrig";
+            this.comboBoxOrig.Size = new System.Drawing.Size(229, 21);
+            this.comboBoxOrig.TabIndex = 28;
+            this.comboBoxOrig.Visible = false;
+            this.comboBoxOrig.SelectedIndexChanged += new System.EventHandler(this.comboBoxOrig_SelectedIndexChanged);
+            // 
+            // radioButtonOrig
+            // 
+            this.radioButtonOrig.AutoSize = true;
+            this.radioButtonOrig.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.radioButtonOrig.Location = new System.Drawing.Point(12, 19);
+            this.radioButtonOrig.Name = "radioButtonOrig";
+            this.radioButtonOrig.Size = new System.Drawing.Size(210, 20);
+            this.radioButtonOrig.TabIndex = 27;
+            this.radioButtonOrig.TabStop = true;
+            this.radioButtonOrig.Text = "Copy settings by Orig Tkpr";
+            this.radioButtonOrig.UseVisualStyleBackColor = true;
+            this.radioButtonOrig.Click += new System.EventHandler(this.radioButtonOrig_Click);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.comboBoxBill);
+            this.groupBox3.Controls.Add(this.radioButtonBill);
+            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.groupBox3.ForeColor = System.Drawing.Color.Navy;
+            this.groupBox3.Location = new System.Drawing.Point(386, 63);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(261, 84);
+            this.groupBox3.TabIndex = 38;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "By Billing Tkpr";
+            // 
+            // comboBoxBill
+            // 
+            this.comboBoxBill.FormattingEnabled = true;
+            this.comboBoxBill.Location = new System.Drawing.Point(13, 44);
+            this.comboBoxBill.Name = "comboBoxBill";
+            this.comboBoxBill.Size = new System.Drawing.Size(229, 21);
+            this.comboBoxBill.TabIndex = 30;
+            this.comboBoxBill.Visible = false;
+            this.comboBoxBill.SelectedIndexChanged += new System.EventHandler(this.comboBoxBill_SelectedIndexChanged);
+            // 
+            // radioButtonBill
+            // 
+            this.radioButtonBill.AutoSize = true;
+            this.radioButtonBill.BackColor = System.Drawing.SystemColors.Window;
+            this.radioButtonBill.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.radioButtonBill.Location = new System.Drawing.Point(13, 19);
+            this.radioButtonBill.Name = "radioButtonBill";
+            this.radioButtonBill.Size = new System.Drawing.Size(220, 20);
+            this.radioButtonBill.TabIndex = 29;
+            this.radioButtonBill.TabStop = true;
+            this.radioButtonBill.Text = "Copy settings by BillingTkpr";
+            this.radioButtonBill.UseVisualStyleBackColor = false;
+            this.radioButtonBill.Click += new System.EventHandler(this.radioButtonBill_Click);
+            // 
             // UtilityBaseMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(853, 417);
+            this.ClientSize = new System.Drawing.Size(853, 456);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox1);
@@ -377,15 +480,12 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.listView2);
             this.Controls.Add(this.comboBox4);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.buttonReport);
+            this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.statusGroupBox);
             this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.listBoxCompanies);
@@ -407,6 +507,12 @@
             this.statusStrip.PerformLayout();
             this.statusGroupBox.ResumeLayout(false);
             this.statusGroupBox.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -425,15 +531,14 @@
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label labelPercentComplete;
         private System.Windows.Forms.OpenFileDialog OpenFileDialogOpen;
-        private System.Windows.Forms.Button buttonReport;
+        private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBoxClient;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.ComboBox comboBox3;
         private System.Windows.Forms.ComboBox comboBox4;
-        private System.Windows.Forms.ListView listView2;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ListView listViewClient;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
@@ -442,6 +547,14 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton radioButtonClient;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.ComboBox comboBoxOrig;
+        private System.Windows.Forms.RadioButton radioButtonOrig;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.ComboBox comboBoxBill;
+        private System.Windows.Forms.RadioButton radioButtonBill;
     }
 }
 
