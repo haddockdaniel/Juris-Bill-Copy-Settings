@@ -276,29 +276,33 @@ namespace JurisUtilityBase
 
         private void runUpdateSQL(string selectedMatters)
         {
-
-            string SQLTkpr = getReportSQL(selectedMatters);
-
-            DataSet report = _jurisUtility.RecordsetFromSQL(SQLTkpr);
-
-            ReportDisplay rpds = new ReportDisplay(report);
-            rpds.ShowDialog();
-
-
-            DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialog == System.Windows.Forms.DialogResult.Yes)
+            if (!string.IsNullOrEmpty(selectedMatters))
             {
-                string SQL = "update billcopy set BilCpyNbrOfCopies=" + textBox2.Text + ", bilcpyprintformat=" + comboBox1.SelectedIndex + ", bilcpyemailformat=" + comboBox3.SelectedIndex + ", bilcpyexportformat=" + comboBox4.SelectedIndex + ", BilCpyARFormat=" + comboBox2.SelectedIndex;
+                string SQLTkpr = getReportSQL(selectedMatters);
 
-                if (!String.IsNullOrEmpty(textBox1.Text)) //if they entered a comment, add it
-                    SQL = SQL + ", BilCpyComment = '" + textBox1.Text + "' from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                else
-                    SQL = SQL + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                _jurisUtility.ExecuteNonQueryCommand(0, SQL);
-                UpdateStatus("Selected matters updated.", 1, 1);
+                DataSet report = _jurisUtility.RecordsetFromSQL(SQLTkpr);
 
-                MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
+                ReportDisplay rpds = new ReportDisplay(report);
+                rpds.ShowDialog();
+
+
+                DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (dialog == System.Windows.Forms.DialogResult.Yes)
+                {
+                    string SQL = "update billcopy set BilCpyNbrOfCopies=" + textBox2.Text + ", bilcpyprintformat=" + comboBox1.SelectedIndex + ", bilcpyemailformat=" + comboBox3.SelectedIndex + ", bilcpyexportformat=" + comboBox4.SelectedIndex + ", BilCpyARFormat=" + comboBox2.SelectedIndex;
+
+                    if (!String.IsNullOrEmpty(textBox1.Text)) //if they entered a comment, add it
+                        SQL = SQL + ", BilCpyComment = '" + textBox1.Text + "' from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+                    else
+                        SQL = SQL + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+                    _jurisUtility.ExecuteNonQueryCommand(0, SQL);
+                    UpdateStatus("Selected matters updated.", 1, 1);
+
+                    MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
+                }
             }
+            else
+                MessageBox.Show("This timekeeper or the selected client(s) have no matters associated" + "\r\n" + "with them so there is nothing to process. Please update your selection.", "No Matters to Process", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
 
