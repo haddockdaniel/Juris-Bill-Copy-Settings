@@ -48,13 +48,7 @@
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.listViewClient = new System.Windows.Forms.ListView();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.radioButtonClient = new System.Windows.Forms.RadioButton();
@@ -64,6 +58,12 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.comboBoxBill = new System.Windows.Forms.ComboBox();
             this.radioButtonBill = new System.Windows.Forms.RadioButton();
+            this.checkBoxNbrCopies = new System.Windows.Forms.CheckBox();
+            this.checkBoxPrintBill = new System.Windows.Forms.CheckBox();
+            this.checkBoxPrintARStmt = new System.Windows.Forms.CheckBox();
+            this.checkBoxEmailType = new System.Windows.Forms.CheckBox();
+            this.checkBoxExportType = new System.Windows.Forms.CheckBox();
+            this.checkBoxComment = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.JurisLogoImageBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LexisNexisLogoPictureBox)).BeginInit();
             this.statusStrip.SuspendLayout();
@@ -221,6 +221,7 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(180, 21);
             this.comboBox1.TabIndex = 22;
+            this.comboBox1.Click += new System.EventHandler(this.comboBox1_Click);
             // 
             // comboBox2
             // 
@@ -232,6 +233,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(180, 21);
             this.comboBox2.TabIndex = 23;
+            this.comboBox2.Click += new System.EventHandler(this.comboBox2_Click);
             // 
             // comboBox3
             // 
@@ -249,6 +251,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(180, 21);
             this.comboBox3.TabIndex = 24;
+            this.comboBox3.Click += new System.EventHandler(this.comboBox3_Click);
             // 
             // comboBox4
             // 
@@ -266,6 +269,7 @@
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(180, 21);
             this.comboBox4.TabIndex = 25;
+            this.comboBox4.Click += new System.EventHandler(this.comboBox4_Click);
             // 
             // listViewClient
             // 
@@ -280,61 +284,6 @@
             this.listViewClient.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
             this.listViewClient.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView2_MouseClick);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Navy;
-            this.label1.Location = new System.Drawing.Point(652, 108);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 16);
-            this.label1.TabIndex = 28;
-            this.label1.Text = "Print Bill";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.Navy;
-            this.label3.Location = new System.Drawing.Point(652, 161);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(98, 16);
-            this.label3.TabIndex = 29;
-            this.label3.Text = "Print AR Stmt";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.Navy;
-            this.label4.Location = new System.Drawing.Point(652, 219);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(87, 16);
-            this.label4.TabIndex = 30;
-            this.label4.Text = "Email Type";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.ForeColor = System.Drawing.Color.Navy;
-            this.label5.Location = new System.Drawing.Point(652, 281);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(92, 16);
-            this.label5.TabIndex = 31;
-            this.label5.Text = "Export Type";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.ForeColor = System.Drawing.Color.Navy;
-            this.label6.Location = new System.Drawing.Point(652, 344);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(179, 16);
-            this.label6.TabIndex = 32;
-            this.label6.Text = "Comment (30 characters)";
-            // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(655, 363);
@@ -342,17 +291,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(176, 20);
             this.textBox1.TabIndex = 33;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.ForeColor = System.Drawing.Color.Navy;
-            this.label7.Location = new System.Drawing.Point(652, 63);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(132, 16);
-            this.label7.TabIndex = 34;
-            this.label7.Text = "Number of Copies";
+            this.textBox1.Click += new System.EventHandler(this.textBox1_Click);
             // 
             // textBox2
             // 
@@ -362,6 +301,7 @@
             this.textBox2.Size = new System.Drawing.Size(62, 20);
             this.textBox2.TabIndex = 35;
             this.textBox2.Text = "1";
+            this.textBox2.Click += new System.EventHandler(this.textBox2_Click);
             // 
             // groupBox1
             // 
@@ -462,6 +402,78 @@
             this.radioButtonBill.UseVisualStyleBackColor = false;
             this.radioButtonBill.Click += new System.EventHandler(this.radioButtonBill_Click);
             // 
+            // checkBoxNbrCopies
+            // 
+            this.checkBoxNbrCopies.AutoSize = true;
+            this.checkBoxNbrCopies.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxNbrCopies.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxNbrCopies.Location = new System.Drawing.Point(655, 62);
+            this.checkBoxNbrCopies.Name = "checkBoxNbrCopies";
+            this.checkBoxNbrCopies.Size = new System.Drawing.Size(151, 20);
+            this.checkBoxNbrCopies.TabIndex = 27;
+            this.checkBoxNbrCopies.Text = "Number of Copies";
+            this.checkBoxNbrCopies.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxPrintBill
+            // 
+            this.checkBoxPrintBill.AutoSize = true;
+            this.checkBoxPrintBill.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxPrintBill.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxPrintBill.Location = new System.Drawing.Point(655, 107);
+            this.checkBoxPrintBill.Name = "checkBoxPrintBill";
+            this.checkBoxPrintBill.Size = new System.Drawing.Size(84, 20);
+            this.checkBoxPrintBill.TabIndex = 39;
+            this.checkBoxPrintBill.Text = "Print Bill";
+            this.checkBoxPrintBill.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxPrintARStmt
+            // 
+            this.checkBoxPrintARStmt.AutoSize = true;
+            this.checkBoxPrintARStmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxPrintARStmt.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxPrintARStmt.Location = new System.Drawing.Point(655, 159);
+            this.checkBoxPrintARStmt.Name = "checkBoxPrintARStmt";
+            this.checkBoxPrintARStmt.Size = new System.Drawing.Size(156, 20);
+            this.checkBoxPrintARStmt.TabIndex = 40;
+            this.checkBoxPrintARStmt.Text = "Print AR Statement";
+            this.checkBoxPrintARStmt.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxEmailType
+            // 
+            this.checkBoxEmailType.AutoSize = true;
+            this.checkBoxEmailType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxEmailType.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxEmailType.Location = new System.Drawing.Point(655, 217);
+            this.checkBoxEmailType.Name = "checkBoxEmailType";
+            this.checkBoxEmailType.Size = new System.Drawing.Size(106, 20);
+            this.checkBoxEmailType.TabIndex = 28;
+            this.checkBoxEmailType.Text = "Email Type";
+            this.checkBoxEmailType.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxExportType
+            // 
+            this.checkBoxExportType.AutoSize = true;
+            this.checkBoxExportType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxExportType.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxExportType.Location = new System.Drawing.Point(655, 280);
+            this.checkBoxExportType.Name = "checkBoxExportType";
+            this.checkBoxExportType.Size = new System.Drawing.Size(111, 20);
+            this.checkBoxExportType.TabIndex = 28;
+            this.checkBoxExportType.Text = "Export Type";
+            this.checkBoxExportType.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxComment
+            // 
+            this.checkBoxComment.AutoSize = true;
+            this.checkBoxComment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
+            this.checkBoxComment.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxComment.Location = new System.Drawing.Point(655, 343);
+            this.checkBoxComment.Name = "checkBoxComment";
+            this.checkBoxComment.Size = new System.Drawing.Size(200, 20);
+            this.checkBoxComment.TabIndex = 28;
+            this.checkBoxComment.Text = "Comment (30 Characters)";
+            this.checkBoxComment.UseVisualStyleBackColor = true;
+            // 
             // UtilityBaseMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -469,17 +481,17 @@
             this.BackColor = System.Drawing.SystemColors.Window;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(853, 456);
+            this.Controls.Add(this.checkBoxComment);
+            this.Controls.Add(this.checkBoxExportType);
+            this.Controls.Add(this.checkBoxEmailType);
+            this.Controls.Add(this.checkBoxPrintARStmt);
+            this.Controls.Add(this.checkBoxPrintBill);
+            this.Controls.Add(this.checkBoxNbrCopies);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.comboBox4);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.comboBox2);
@@ -539,13 +551,7 @@
         private System.Windows.Forms.ComboBox comboBox3;
         private System.Windows.Forms.ComboBox comboBox4;
         private System.Windows.Forms.ListView listViewClient;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButtonClient;
@@ -555,6 +561,12 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ComboBox comboBoxBill;
         private System.Windows.Forms.RadioButton radioButtonBill;
+        private System.Windows.Forms.CheckBox checkBoxNbrCopies;
+        private System.Windows.Forms.CheckBox checkBoxPrintBill;
+        private System.Windows.Forms.CheckBox checkBoxPrintARStmt;
+        private System.Windows.Forms.CheckBox checkBoxEmailType;
+        private System.Windows.Forms.CheckBox checkBoxExportType;
+        private System.Windows.Forms.CheckBox checkBoxComment;
     }
 }
 

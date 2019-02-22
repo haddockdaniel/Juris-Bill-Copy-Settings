@@ -285,27 +285,62 @@ namespace JurisUtilityBase
                 ReportDisplay rpds = new ReportDisplay(report);
                 rpds.ShowDialog();
 
-
-                DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (dialog == System.Windows.Forms.DialogResult.Yes)
+                if (areAnyCheckBoxesChecked())
                 {
-                    string SQL = "update billcopy set BilCpyNbrOfCopies=" + textBox2.Text + ", bilcpyprintformat=" + comboBox1.SelectedIndex + ", bilcpyemailformat=" + comboBox3.SelectedIndex + ", bilcpyexportformat=" + comboBox4.SelectedIndex + ", BilCpyARFormat=" + comboBox2.SelectedIndex;
+                    string options = returnSQLUpdateString();
+                    DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (dialog == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        string SQL = "update billcopy set " + options + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
+                        _jurisUtility.ExecuteNonQueryCommand(0, SQL);
+                        UpdateStatus("Selected matters updated.", 1, 1);
 
-                    if (!String.IsNullOrEmpty(textBox1.Text)) //if they entered a comment, add it
-                        SQL = SQL + ", BilCpyComment = '" + textBox1.Text + "' from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                    else
-                        SQL = SQL + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                    _jurisUtility.ExecuteNonQueryCommand(0, SQL);
-                    UpdateStatus("Selected matters updated.", 1, 1);
-
-                    MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
+                        MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
+                    }
                 }
+                else
+                    MessageBox.Show("There are no checkboxes checked. Please update your selection.", "No selections made", MessageBoxButtons.OK, MessageBoxIcon.None);
             }
             else
                 MessageBox.Show("This timekeeper or the selected client(s) have no matters associated" + "\r\n" + "with them so there is nothing to process. Please update your selection.", "No Matters to Process", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
 
+        private bool areAnyCheckBoxesChecked()
+        {
+            if (checkBoxNbrCopies.Checked == true)
+                return true;
+            if (checkBoxPrintBill.Checked == true)
+                return true;
+            if (checkBoxPrintARStmt.Checked == true)
+                return true;
+            if (checkBoxEmailType.Checked == true)
+                return true;
+            if (checkBoxExportType.Checked == true)
+                return true;
+            if (checkBoxComment.Checked == true)
+                return true;
+            return false;
+        }
+
+        private string returnSQLUpdateString()
+        {
+            string SQL = "";
+            if (checkBoxNbrCopies.Checked == true)
+                SQL = " BilCpyNbrOfCopies=" + textBox2.Text + ",";
+            if (checkBoxPrintBill.Checked == true)
+                SQL = SQL + " bilcpyprintformat=" + comboBox1.SelectedIndex + ",";
+            if (checkBoxPrintARStmt.Checked == true)
+                SQL = SQL + " BilCpyARFormat=" + comboBox3.SelectedIndex + ","; 
+            if (checkBoxEmailType.Checked == true)
+                SQL = SQL + " bilcpyemailformat=" + comboBox4.SelectedIndex + ","; 
+            if (checkBoxExportType.Checked == true)
+                SQL = SQL + " bilcpyexportformat=" + comboBox2.SelectedIndex + ","; 
+            if (checkBoxComment.Checked == true)
+                SQL = SQL + " BilCpyComment = '" + textBox1.Text + "'";
+            SQL = SQL.TrimEnd(',');
+            return SQL;
+        }
 
 
         private bool VerifyFirmName()
@@ -462,9 +497,7 @@ namespace JurisUtilityBase
 
         private void buttonExit_Click(object sender, EventArgs e)
         {
-
             System.Environment.Exit(0);
-          
         }
 
         private string getReportSQL(string selectedMatters)
@@ -532,9 +565,6 @@ namespace JurisUtilityBase
                 where.Item.Checked = true;
             }
 
-            //clientID = listView2.CheckedItems[0].SubItems[0].Text;
-
-
         }
 
 
@@ -592,7 +622,35 @@ namespace JurisUtilityBase
                 employeesBill = allEmployeesBill;
         }
 
+        private void textBox2_Click(object sender, EventArgs e)
+        {
+            checkBoxNbrCopies.Checked = true;
+        }
 
+        private void comboBox1_Click(object sender, EventArgs e)
+        {
+            checkBoxPrintBill.Checked = true;
+        }
+
+        private void comboBox2_Click(object sender, EventArgs e)
+        {
+            checkBoxPrintARStmt.Checked = true;
+        }
+
+        private void comboBox3_Click(object sender, EventArgs e)
+        {
+            checkBoxEmailType.Checked = true;
+        }
+
+        private void comboBox4_Click(object sender, EventArgs e)
+        {
+            checkBoxExportType.Checked = true;
+        }
+
+        private void textBox1_Click(object sender, EventArgs e)
+        {
+            checkBoxComment.Checked = true;
+        }
 
     }
 }
