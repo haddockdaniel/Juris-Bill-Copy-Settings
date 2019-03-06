@@ -198,10 +198,20 @@ namespace JurisUtilityBase
                 
                 //orig
                 if (radioButtonBill.Checked)
-                    processByBillTkpr();
+                {
+                    if (comboBoxBill.SelectedIndex > -1)
+                        processByBillTkpr();
+                    else
+                        MessageBox.Show("Please select a Billing Atty", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                }
                 //bill
                 else if (radioButtonOrig.Checked)
-                    processByOrigTkpr();
+                {
+                    if (comboBoxOrig.SelectedIndex > -1)
+                        processByOrigTkpr();
+                    else
+                        MessageBox.Show("Please select an Originating Atty", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                }
 
                 //client
                 else if (radioButtonClient.Checked)
