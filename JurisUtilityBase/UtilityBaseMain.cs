@@ -12,6 +12,7 @@ using JDataEngine;
 using JurisAuthenticator;
 using JurisUtilityBase.Properties;
 using System.Data.OleDb;
+using System.Threading;
 
 namespace JurisUtilityBase
 {
@@ -38,6 +39,8 @@ namespace JurisUtilityBase
         public string employeesBill = "";
 
         public string allEmployeesBill = ""; //used if they select all employees
+
+        List<string> matterList = new List<string>();
 
         private ListViewColumnSorter lvwColumnSorter1;
 
@@ -217,6 +220,8 @@ namespace JurisUtilityBase
                 else if (radioButtonClient.Checked)
                     processByClient();
 
+
+                
           //  }
           //  catch (Exception ex1)//we only get here if they put something NOT an int in the "Number of Copies" textbox
           //  {
@@ -226,74 +231,91 @@ namespace JurisUtilityBase
 
         private void processByBillTkpr()
         {
-            string selectedMatters = "";
             String SQL = "";
 
             SQL = "SELECT MatSysNbr FROM [BillTo] inner join matter on BillToSysNbr = MatBillTo where BillToBillingAtty in (" + employeesBill + ")";
             DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
             foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
             {
-                selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
+                matterList.Add(dr["MatSysNbr"].ToString());
             }
-            selectedMatters = selectedMatters.TrimEnd(',');
-            runUpdateSQL(selectedMatters);
+            runUpdateSQL();
         }
 
         private void processByOrigTkpr()
         {
-            string selectedMatters = "";
             string SQL = "SELECT MOrigMat FROM MatOrigAtty where MOrigAtty in (" + employeesOrig + ")";
             DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
             foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
             {
-                selectedMatters = selectedMatters + dr["MOrigMat"].ToString() + ",";
+                matterList.Add(dr["MOrigMat"].ToString());
             }
-            selectedMatters = selectedMatters.TrimEnd(',');
-            runUpdateSQL(selectedMatters);
+            runUpdateSQL();
 
 
         }
 
         private void processByClient()
         {
-            string selectedClients = "";
+            List<string> clientList = new List<string>();
+            
             foreach (ListViewItem eachItem in listViewClient.CheckedItems)
             {
-                selectedClients = selectedClients + eachItem.SubItems[0].Text + ","; //get the client id from each item selected
+                clientList.Add(eachItem.SubItems[0].Text); //get the client id from each item selected
             }
 
-            selectedClients = selectedClients.TrimEnd(',');
-            if (!String.IsNullOrEmpty(selectedClients))
+            if (clientList != null && clientList.Count > 0)
             {
-
+                MessageBox.Show("This process can take a long time for large data sets. " + "\r\n" + "The report will load once all your data has been read." + "\r\n" + "It is normal for the screen to do nothing during this time." + "\r\n" + "Press 'OK' to continue", "Long process warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     //get matterIDs from clients
-                    string selectedMatters = "";
-                    string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr in (" + selectedClients + ") and MatStatusFlag <> 'C'";
-                    DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
-                    foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+                    Semaphore semaphoreCli = new Semaphore(100, 100);
+                    foreach (string cli in clientList)
                     {
-                        selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
+                        semaphoreCli.WaitOne();
+                        string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr = " + cli + " and MatStatusFlag <> 'C'";
+                        DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
+                        foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
+                        {
+                            // selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
+                            matterList.Add(dr["MatSysNbr"].ToString());
+                        }
+                        semaphoreCli.Release();
                     }
-                    selectedMatters = selectedMatters.TrimEnd(',');
-
                     //now do the damn thing
-                    runUpdateSQL(selectedMatters);
+                    _jurisUtility.CloseDatabase(); //resets connections
+                    runUpdateSQL();
                 
             }
             else //there were no matters selected
                 MessageBox.Show("Please select at least one client", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
         }
 
-        private void runUpdateSQL(string selectedMatters)
+        private void runUpdateSQL()//uses Matterlist
         {
-            if (!string.IsNullOrEmpty(selectedMatters))
+            DataSet finalDS = new DataSet();
+            if (matterList != null && matterList.Count > 0)
             {
-                string SQLTkpr = getReportSQL(selectedMatters);
+                string reportSQL = "";
+                //if matter and billing timekeeper
+                Semaphore semaphoreMat = new Semaphore(100, 100);
+                _jurisUtility.OpenDatabase();
+                foreach (string mat in matterList)
+                {
+                    semaphoreMat.WaitOne();
+                    reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname" +
+                            " from matter" +
+                            " inner join client on matclinbr=clisysnbr where matsysnbr = " + mat;
 
-                DataSet report = _jurisUtility.RecordsetFromSQL(SQLTkpr);
+                    DataSet report = _jurisUtility.RecordsetFromSQL(reportSQL);
+                    finalDS.Merge(report);
+                    semaphoreMat.Release();
+                }
 
-                ReportDisplay rpds = new ReportDisplay(report);
+                finalDS.Tables[0].DefaultView.Sort = "Clicode";
+                ReportDisplay rpds = new ReportDisplay(finalDS);
                 rpds.ShowDialog();
+
+                _jurisUtility.CloseDatabase();
 
                 if (areAnyCheckBoxesChecked())
                 {
@@ -301,10 +323,21 @@ namespace JurisUtilityBase
                     DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dialog == System.Windows.Forms.DialogResult.Yes)
                     {
-                        string SQL = "update billcopy set " + options + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr in (" + selectedMatters + ")";
-                        _jurisUtility.ExecuteNonQueryCommand(0, SQL);
-                        UpdateStatus("Selected matters updated.", 1, 1);
-
+                        _jurisUtility.OpenDatabase();
+                        Semaphore semaphoreUpdate = new Semaphore(100,100);
+                        int count = 1;
+                        foreach (string mat in matterList)
+                        {
+                            semaphoreUpdate.WaitOne();
+                            string SQL = "update billcopy set " + options + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr = " + mat;
+                            _jurisUtility.ExecuteNonQueryCommand(0, SQL);
+                            semaphoreUpdate.Release();
+                            UpdateStatus("Updating Items", count, matterList.Count);
+                            count++;
+                        }
+                        UpdateStatus("Finished", matterList.Count, matterList.Count);
+                        matterList.Clear();
+                        _jurisUtility.CloseDatabase();
                         MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
                     }
                 }
@@ -510,17 +543,6 @@ namespace JurisUtilityBase
             System.Environment.Exit(0);
         }
 
-        private string getReportSQL(string selectedMatters)
-        {
-            string reportSQL = "";
-            //if matter and billing timekeeper
-                reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname" +
-                        " from matter" +
-                        " inner join client on matclinbr=clisysnbr where matsysnbr in (" + selectedMatters + ")";
-
-
-            return reportSQL;
-        }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
