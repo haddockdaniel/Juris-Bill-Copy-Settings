@@ -13,6 +13,7 @@ using JurisAuthenticator;
 using JurisUtilityBase.Properties;
 using System.Data.OleDb;
 using System.Threading;
+using JurisSVR;
 
 namespace JurisUtilityBase
 {
@@ -30,6 +31,8 @@ namespace JurisUtilityBase
 
         public string JurisDbName { get; set; }
 
+        public bool allSelected = false;
+
         public string JBillsDbName { get; set; }
 
         public string employeesOrig = "";
@@ -39,8 +42,6 @@ namespace JurisUtilityBase
         public string employeesBill = "";
 
         public string allEmployeesBill = ""; //used if they select all employees
-
-        List<string> matterList = new List<string>();
 
         private ListViewColumnSorter lvwColumnSorter1;
 
@@ -232,90 +233,185 @@ namespace JurisUtilityBase
         private void processByBillTkpr()
         {
             String SQL = "";
+            string matList = "";
+            List<ThousandMatters> matters = new List<ThousandMatters>();
+            ThousandMatters tm = null;
+            int counter = 0;
 
             SQL = "SELECT MatSysNbr FROM [BillTo] inner join matter on BillToSysNbr = MatBillTo where BillToBillingAtty in (" + employeesBill + ")";
             DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
             foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
             {
-                matterList.Add(dr["MatSysNbr"].ToString());
+
+                matList = matList + dr["MatSysNbr"].ToString() + ",";
+                counter++;
+                if (counter == 1000)
+                {
+                    tm = new ThousandMatters();
+                    matList = matList.TrimEnd(',');
+                    tm.matters = matList;
+                    matters.Add(tm);
+                    counter = 0;
+                    matList = "";
+                }
             }
-            runUpdateSQL();
+            if (!string.IsNullOrEmpty(matList))
+            {
+                tm = new ThousandMatters();
+                matList = matList.TrimEnd(',');
+                tm.matters = matList;
+                matters.Add(tm);
+                matList = "";
+            }
+            runUpdateSQL(matters, false);
         }
 
         private void processByOrigTkpr()
         {
+            List<ThousandMatters> matters = new List<ThousandMatters>();
+            ThousandMatters tm = null;
+            int counter = 0;
+            string matList = "";
+
             string SQL = "SELECT MOrigMat FROM MatOrigAtty where MOrigAtty in (" + employeesOrig + ")";
             DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
             foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
             {
-                matterList.Add(dr["MOrigMat"].ToString());
+
+                matList = matList + dr["MOrigMat"].ToString() + ",";
+                counter++;
+                if (counter == 1000)
+                {
+                    tm = new ThousandMatters();
+                    matList = matList.TrimEnd(',');
+                    tm.matters = matList;
+                    matters.Add(tm);
+                    counter = 0;
+                    matList = "";
+                }
             }
-            runUpdateSQL();
+            if (!string.IsNullOrEmpty(matList))
+            {
+                tm = new ThousandMatters();
+                matList = matList.TrimEnd(',');
+                tm.matters = matList;
+                matters.Add(tm);
+                matList = "";
+            }
+            runUpdateSQL(matters, false);
 
 
         }
 
         private void processByClient()
         {
-            List<string> clientList = new List<string>();
-            
-            foreach (ListViewItem eachItem in listViewClient.CheckedItems)
+            if (!allSelected)
             {
-                clientList.Add(eachItem.SubItems[0].Text); //get the client id from each item selected
-            }
+                string cliList = "";
+                string matList = "";
 
-            if (clientList != null && clientList.Count > 0)
-            {
-                MessageBox.Show("This process can take a long time for large data sets. " + "\r\n" + "The report will load once all your data has been read." + "\r\n" + "It is normal for the screen to do nothing during this time." + "\r\n" + "Press 'OK' to continue", "Long process warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    //get matterIDs from clients
-                    Semaphore semaphoreCli = new Semaphore(100, 100);
-                    foreach (string cli in clientList)
+                List<ThousandMatters> clients = new List<ThousandMatters>();
+                List<ThousandMatters> matters = new List<ThousandMatters>();
+                ThousandMatters tm = null;
+                int counter = 0;
+                foreach (ListViewItem eachItem in listViewClient.CheckedItems)
+                {
+                    cliList = cliList + eachItem.SubItems[0].Text + ","; //get the client id from each item selected
+                    counter++;
+                    if (counter == 1000)
                     {
-                        semaphoreCli.WaitOne();
-                        string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr = " + cli + " and MatStatusFlag <> 'C'";
+                        tm = new ThousandMatters();
+                        cliList = cliList.TrimEnd(',');
+                        tm.matters = cliList;
+                        clients.Add(tm);
+                        counter = 0;
+                        cliList = "";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(cliList))
+                {
+                    tm = new ThousandMatters();
+                    cliList = cliList.TrimEnd(',');
+                    tm.matters = cliList;
+                    clients.Add(tm);
+                    cliList = "";
+                }
+
+                if (clients.Count != 0)
+                {
+                    MessageBox.Show("This process can take a long time for large data sets. " + "\r\n" + "The report will load once all your data has been read." + "\r\n" + "It is normal for the screen to do nothing during this time." + "\r\n" + "Press 'OK' to continue", "Long process warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    //get matterIDs from clients
+                    foreach (ThousandMatters ttt in clients)
+                    {
+                        string SQL = "SELECT MatSysNbr FROM Matter where MatCliNbr in (" + ttt.matters + ") and MatStatusFlag <> 'C'";
                         DataSet myRSTkpr = _jurisUtility.RecordsetFromSQL(SQL);
+                        counter = 0;
                         foreach (DataRow dr in myRSTkpr.Tables[0].Rows)
                         {
-                            // selectedMatters = selectedMatters + dr["MatSysNbr"].ToString() + ",";
-                            matterList.Add(dr["MatSysNbr"].ToString());
+
+                            matList = matList + dr["MatSysNbr"].ToString() + ",";
+                            counter++;
+                            if (counter == 1000)
+                            {
+                                tm = new ThousandMatters();
+                                matList = matList.TrimEnd(',');
+                                tm.matters = matList;
+                                matters.Add(tm);
+                                counter = 0;
+                                matList = "";
+                            }
                         }
-                        semaphoreCli.Release();
+                        if (!string.IsNullOrEmpty(matList))
+                        {
+                            tm = new ThousandMatters();
+                            matList = matList.TrimEnd(',');
+                            tm.matters = matList;
+                            matters.Add(tm);
+                            matList = "";
+                        }
                     }
                     //now do the damn thing
-                    _jurisUtility.CloseDatabase(); //resets connections
-                    runUpdateSQL();
-                
+                    runUpdateSQL(matters, allSelected); //make objects 100 (or whateve)_ ids at a time and fun in a loop
+
+                }
+                else //there were no matters selected
+                    MessageBox.Show("Please select at least one client", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
-            else //there were no matters selected
-                MessageBox.Show("Please select at least one client", "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            else
+                runUpdateSQL(null, allSelected);
         }
 
-        private void runUpdateSQL()//uses Matterlist
+        private void runUpdateSQL(List<ThousandMatters> matters, bool runAll)//uses Matterlist
         {
             DataSet finalDS = new DataSet();
-            if (matterList != null && matterList.Count > 0)
+            if ((matters == null && runAll) || matters.Count != 0)
             {
                 string reportSQL = "";
                 //if matter and billing timekeeper
-                Semaphore semaphoreMat = new Semaphore(100, 100);
-                _jurisUtility.OpenDatabase();
-                foreach (string mat in matterList)
+                if (runAll)
                 {
-                    semaphoreMat.WaitOne();
                     reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname" +
                             " from matter" +
-                            " inner join client on matclinbr=clisysnbr where matsysnbr = " + mat;
-
+                            " inner join client on matclinbr=clisysnbr where MatStatusFlag <> 'C'";
+                }
+                else
+                {
+                    foreach (ThousandMatters tt in matters)
+                    {
+                        reportSQL = reportSQL = "select Clicode, Clireportingname, Matcode, Matreportingname" +
+                                " from matter" +
+                                " inner join client on matclinbr=clisysnbr where matsysnbr in (" + tt.matters + ")" +
+                                "union all";
+                    }
+                    reportSQL = reportSQL.Substring(0, reportSQL.Length - "union all".Length);
+                }
                     DataSet report = _jurisUtility.RecordsetFromSQL(reportSQL);
                     finalDS.Merge(report);
-                    semaphoreMat.Release();
-                }
 
                 finalDS.Tables[0].DefaultView.Sort = "Clicode";
                 ReportDisplay rpds = new ReportDisplay(finalDS);
                 rpds.ShowDialog();
-
-                _jurisUtility.CloseDatabase();
 
                 if (areAnyCheckBoxesChecked())
                 {
@@ -323,21 +419,27 @@ namespace JurisUtilityBase
                     DialogResult dialog = MessageBox.Show("This tool will update all BillCopy Settings for all matters associated" + "\r\n" + "with the selections. This cannot be undone. Are you sure?", "Confirmation Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dialog == System.Windows.Forms.DialogResult.Yes)
                     {
-                        _jurisUtility.OpenDatabase();
-                        Semaphore semaphoreUpdate = new Semaphore(100,100);
-                        int count = 1;
-                        foreach (string mat in matterList)
+                        
+                        string SQL = "";
+                        if (runAll)
                         {
-                            semaphoreUpdate.WaitOne();
-                            string SQL = "update billcopy set " + options + " from billto inner join matter on matbillto=billtosysnbr where bilcpybillto=billtosysnbr and matsysnbr = " + mat;
+                            SQL = "update C set " + options + " from billcopy C inner join billto T on T.BillToSysNbr = C.BilCpyBillTo inner join matter M on M.matbillto=T.billtosysnbr where MatStatusFlag <> 'C'";
                             _jurisUtility.ExecuteNonQueryCommand(0, SQL);
-                            semaphoreUpdate.Release();
-                            UpdateStatus("Updating Items", count, matterList.Count);
-                            count++;
+
                         }
-                        UpdateStatus("Finished", matterList.Count, matterList.Count);
-                        matterList.Clear();
-                        _jurisUtility.CloseDatabase();
+                        else
+                        {
+                            int count = 0;
+                            foreach (ThousandMatters gg in matters)
+                            {
+                                SQL = "update C set " + options + " from billcopy C inner join billto T on T.BillToSysNbr = C.BilCpyBillTo inner join matter M on M.matbillto=T.billtosysnbr where matsysnbr in (" + gg.matters + ")";
+                                _jurisUtility.ExecuteNonQueryCommand(0, SQL);
+                                count++;
+                                UpdateStatus("Updating", count, matters.Count);
+                            }
+                        }
+                        UpdateStatus("Finished", 1,1);
+
                         MessageBox.Show("The process is complete", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.None);
                     }
                 }
@@ -374,11 +476,11 @@ namespace JurisUtilityBase
             if (checkBoxPrintBill.Checked == true)
                 SQL = SQL + " bilcpyprintformat=" + comboBox1.SelectedIndex + ",";
             if (checkBoxPrintARStmt.Checked == true)
-                SQL = SQL + " BilCpyARFormat=" + comboBox3.SelectedIndex + ","; 
+                SQL = SQL + " BilCpyARFormat=" + comboBox2.SelectedIndex + ","; 
             if (checkBoxEmailType.Checked == true)
-                SQL = SQL + " bilcpyemailformat=" + comboBox4.SelectedIndex + ","; 
+                SQL = SQL + " bilcpyemailformat=" + comboBox3.SelectedIndex + ","; 
             if (checkBoxExportType.Checked == true)
-                SQL = SQL + " bilcpyexportformat=" + comboBox2.SelectedIndex + ","; 
+                SQL = SQL + " bilcpyexportformat=" + comboBox4.SelectedIndex + ","; 
             if (checkBoxComment.Checked == true)
                 SQL = SQL + " BilCpyComment = '" + textBox1.Text + "'";
             SQL = SQL.TrimEnd(',');
@@ -552,7 +654,7 @@ namespace JurisUtilityBase
                 {
                     listViewClient.Items[i].Checked = true;
                 }
-
+                allSelected = true;
             }
             else //we want them all DESELECTED
             {
@@ -560,6 +662,7 @@ namespace JurisUtilityBase
                 {
                     listViewClient.Items[i].Checked = false;
                 }
+                allSelected = false;
             }
         }
 
@@ -596,7 +699,7 @@ namespace JurisUtilityBase
             {
                 where.Item.Checked = true;
             }
-
+            
         }
 
 
@@ -684,5 +787,14 @@ namespace JurisUtilityBase
             checkBoxComment.Checked = true;
         }
 
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listViewClient_Click(object sender, EventArgs e)
+        {
+            allSelected = false;
+        }
     }
 }

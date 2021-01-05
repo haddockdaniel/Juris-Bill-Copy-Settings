@@ -251,6 +251,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(180, 21);
             this.comboBox3.TabIndex = 24;
+            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
             this.comboBox3.Click += new System.EventHandler(this.comboBox3_Click);
             // 
             // comboBox4
@@ -273,6 +274,7 @@
             // 
             // listViewClient
             // 
+            this.listViewClient.HideSelection = false;
             this.listViewClient.Location = new System.Drawing.Point(12, 45);
             this.listViewClient.Name = "listViewClient";
             this.listViewClient.Size = new System.Drawing.Size(510, 173);
@@ -282,6 +284,7 @@
             this.listViewClient.View = System.Windows.Forms.View.Details;
             this.listViewClient.Visible = false;
             this.listViewClient.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.listViewClient.Click += new System.EventHandler(this.listViewClient_Click);
             this.listViewClient.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView2_MouseClick);
             // 
             // textBox1
